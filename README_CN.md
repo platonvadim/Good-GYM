@@ -140,7 +140,7 @@
 
 2. **运行应用**
    ```bash
-   python workout_qt_modular.py
+   python run.py
    ```
 
 ## 🖼️ 应用截图
