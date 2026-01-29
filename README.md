@@ -140,7 +140,7 @@ All exercise types are now stored in the `data/exercises.json` file. You can eas
 
 2. **Run the application**
    ```bash
-   python workout_qt_modular.py
+   python run.py
    ```
 
 ## 🖼️ Screenshots
