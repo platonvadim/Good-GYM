@@ -8,7 +8,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/yo-WASSUP/Good-GYM?style=social)](https://github.com/yo-WASSUP/Good-GYM/network/members)
 [![GitHub license](https://img.shields.io/github/license/yo-WASSUP/Good-GYM)](https://github.com/yo-WASSUP/Good-GYM/blob/main/LICENSE)
 
-**AI Fitness Assistant Based on RTMPose**
+**AI Fitness Assistant**
 
 [English](README.md) | [中文](README_CN.md)
 
@@ -80,10 +80,40 @@ All exercise types are now stored in the `data/exercises.json` file. You can eas
 
 1. **Keypoint Index Reference**
    - The system uses COCO 17 keypoint format:
-     - `0`: nose, `1`: left_eye, `2`: right_eye, `3`: left_ear, `4`: right_ear
-     - `5`: left_shoulder, `6`: right_shoulder, `7`: left_elbow, `8`: right_elbow
-     - `9`: left_wrist, `10`: right_wrist, `11`: left_hip, `12`: right_hip
-     - `13`: left_knee, `14`: right_knee, `15`: left_ankle, `16`: right_ankle
+     ```
+                    ○ 0
+                   /|\
+            1 ●     |     ● 2
+           3 ●      |      ● 4
+                    |
+          5 ●———————————● 6
+            |       |       |
+            |       |       |
+          7 ●       |       ● 8
+            |       |       |
+            |       |       |
+          9 ●       |       ● 10
+                    |
+         11 ●———————————● 12
+            |               |
+            |               |
+         13 ●               ● 14
+            |               |
+            |               |
+         15 ●               ● 16
+
+      Index │ Keypoint    Index │ Keypoint
+      ──────┼──────────  ──────┼──────────
+        0   │ Nose          9  │ L.Wrist
+        1   │ L.Eye        10  │ R.Wrist
+        2   │ R.Eye        11  │ L.Hip
+        3   │ L.Ear        12  │ R.Hip
+        4   │ R.Ear        13  │ L.Knee
+        5   │ L.Shoulder   14  │ R.Knee
+        6   │ R.Shoulder   15  │ L.Ankle
+        7   │ L.Elbow      16  │ R.Ankle
+        8   │ R.Elbow
+     ```
 
 2. **Configuration Parameters**
    - `down_angle`: Angle threshold when lowering (degrees)
@@ -140,7 +170,7 @@ All exercise types are now stored in the `data/exercises.json` file. You can eas
 
 2. **Run the application**
    ```bash
-   python workout_qt_modular.py
+   python run.py
    ```
 
 ## 🖼️ Screenshots
@@ -164,4 +194,8 @@ Thanks to RTMPose open source pose detection model: https://github.com/Tau-J/rtm
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=yo-WASSUP/Good-GYM&type=Date)](https://star-history.com/#yo-WASSUP/Good-GYM&Date)
 

@@ -8,7 +8,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/yo-WASSUP/Good-GYM?style=social)](https://github.com/yo-WASSUP/Good-GYM/network/members)
 [![GitHub license](https://img.shields.io/github/license/yo-WASSUP/Good-GYM)](https://github.com/yo-WASSUP/Good-GYM/blob/main/LICENSE)
 
-**基于RTMPose姿态检测的AI健身助手**
+**AI健身助手**
 
 [English](README.md) | [中文](README_CN.md)
 
@@ -86,10 +86,40 @@
 
 1. **关节点索引说明**
    - 系统使用 COCO 17 关键点格式，索引对应关系：
-     - `0`: 鼻子, `1`: 左眼, `2`: 右眼, `3`: 左耳, `4`: 右耳
-     - `5`: 左肩, `6`: 右肩, `7`: 左肘, `8`: 右肘
-     - `9`: 左手腕, `10`: 右手腕, `11`: 左臀, `12`: 右臀
-     - `13`: 左膝, `14`: 右膝, `15`: 左脚踝, `16`: 右脚踝
+     ```
+                    ○ 0
+                   /|\
+            1 ●     |     ● 2
+           3 ●      |      ● 4
+                    |
+          5 ●———————————● 6
+            |       |       |
+            |       |       |
+          7 ●       |       ● 8
+            |       |       |
+            |       |       |
+          9 ●       |       ● 10
+                    |
+         11 ●———————————● 12
+            |               |
+            |               |
+         13 ●               ● 14
+            |               |
+            |               |
+         15 ●               ● 16
+
+      索引 │ 部位        索引 │ 部位
+      ─────┼──────      ─────┼──────
+        0  │ 鼻子         9  │ 左手腕
+        1  │ 左眼        10  │ 右手腕
+        2  │ 右眼        11  │ 左臀
+        3  │ 左耳        12  │ 右臀
+        4  │ 右耳        13  │ 左膝
+        5  │ 左肩        14  │ 右膝
+        6  │ 右肩        15  │ 左脚踝
+        7  │ 左肘        16  │ 右脚踝
+        8  │ 右肘
+     ```
 
 2. **配置参数说明**
    - `down_angle`: 动作下放时的角度阈值（度）
@@ -164,3 +194,7 @@
 ## 📄 许可证
 
 本项目采用MIT许可证 - 详情请参阅LICENSE文件。
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=yo-WASSUP/Good-GYM&type=Date)](https://star-history.com/#yo-WASSUP/Good-GYM&Date)
