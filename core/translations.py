@@ -353,7 +353,23 @@ class Translations:
             "zh": "镜像模式",
             "en": "Mirror Mode",
         },
-        
+        "gpu_acceleration": {
+            "zh": "GPU加速",
+            "en": "GPU Acceleration",
+        },
+        "gpu_enabled": {
+            "zh": "已启用GPU加速",
+            "en": "GPU acceleration enabled",
+        },
+        "gpu_disabled": {
+            "zh": "已切换到CPU模式",
+            "en": "Switched to CPU mode",
+        },
+        "gpu_not_available": {
+            "zh": "未检测到GPU，仅支持CPU模式",
+            "en": "No GPU detected, CPU mode only",
+        },
+
     }
     
     @classmethod

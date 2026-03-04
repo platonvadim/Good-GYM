@@ -60,10 +60,72 @@ class WorkoutTrackerApp(QMainWindow):
         # 显示欢迎消息
         self.statusBar.showMessage(f"{T.get('welcome')} - RTMPose ({self.model_mode}) on {self.device}")
     
+    @staticmethod
+    def _register_nvidia_dll_dirs():
+        """Add pip-installed NVIDIA package DLL directories to PATH so onnxruntime can find CUDA libs"""
+        try:
+            import nvidia
+            nvidia_root = os.path.dirname(nvidia.__file__)
+            paths_to_add = []
+            for pkg in os.listdir(nvidia_root):
+                bin_dir = os.path.join(nvidia_root, pkg, 'bin')
+                if os.path.isdir(bin_dir):
+                    paths_to_add.append(bin_dir)
+            if paths_to_add:
+                os.environ['PATH'] = ';'.join(paths_to_add) + ';' + os.environ.get('PATH', '')
+                print(f"Added {len(paths_to_add)} NVIDIA DLL directories to PATH")
+        except ImportError:
+            pass  # No pip-installed nvidia packages
+        except Exception as e:
+            print(f"Warning: Failed to register NVIDIA DLL dirs: {e}")
+
+    def _detect_device(self):
+        """Detect available inference device by testing CUDA session creation"""
+        self._register_nvidia_dll_dirs()
+        try:
+            import onnxruntime as ort
+            if 'CUDAExecutionProvider' not in ort.get_available_providers():
+                print("CUDAExecutionProvider not listed, using CPU")
+                return 'cpu'
+            # get_available_providers() lists CUDA even when CUDA toolkit is missing.
+            # Actually try to create a session with CUDA to verify it works.
+            det_model = os.path.join('./models', 'yolox_nano_8xb8-300e_humanart-40f6f0d0.onnx')
+            if not os.path.exists(det_model):
+                print("No local model for CUDA test, using CPU")
+                return 'cpu'
+            sess_options = ort.SessionOptions()
+            sess_options.log_severity_level = 4  # FATAL only
+            # Suppress onnxruntime's C++ stderr output during the CUDA probe
+            # sys.stderr redirect doesn't work because onnxruntime writes at C level
+            devnull_fd = os.open(os.devnull, os.O_WRONLY)
+            old_stderr_fd = os.dup(2)
+            os.dup2(devnull_fd, 2)
+            try:
+                sess = ort.InferenceSession(
+                    det_model, sess_options,
+                    providers=['CUDAExecutionProvider']
+                )
+                active_providers = sess.get_providers()
+                del sess
+            finally:
+                os.dup2(old_stderr_fd, 2)
+                os.close(old_stderr_fd)
+                os.close(devnull_fd)
+            if 'CUDAExecutionProvider' in active_providers:
+                print("CUDA GPU verified, using GPU inference")
+                return 'cuda'
+            else:
+                print("CUDA runtime not available, using CPU")
+                return 'cpu'
+        except Exception as e:
+            print(f"CUDA detection failed: {e}")
+        print("Using CPU inference")
+        return 'cpu'
+
     def _init_core_components(self):
         """初始化核心组件"""
-        # 设备设置
-        self.device = 'cpu'
+        # 设备设置 - 自动检测GPU
+        self.device = self._detect_device()
         self.model_mode = 'balanced'
         
         # 创建运动计数器
@@ -110,6 +172,10 @@ class WorkoutTrackerApp(QMainWindow):
         """初始化面板"""
         # 初始化运动统计面板
         self.stats_manager.init_workout_stats()
+
+        # 设置GPU开关初始状态
+        gpu_available = self.device == 'cuda'
+        self.control_panel.set_gpu_available(gpu_available)
         
     
     def _init_state_variables(self):
@@ -186,7 +252,8 @@ class WorkoutTrackerApp(QMainWindow):
         self.control_panel.skeleton_toggled.connect(self.toggle_skeleton)
         self.control_panel.model_changed.connect(self.change_model)
         self.control_panel.mirror_toggled.connect(self.toggle_mirror)
-        
+        self.control_panel.device_changed.connect(self.change_device)
+
         # 连接新按钮信号
         self.control_panel.counter_increase.connect(self.increase_counter)
         self.control_panel.counter_decrease.connect(self.decrease_counter)
@@ -281,6 +348,10 @@ class WorkoutTrackerApp(QMainWindow):
         """切换回摄像头模式"""
         self.video_processor.switch_to_camera_mode()
     
+    def change_device(self, device):
+        """切换推理设备 (cpu/cuda)"""
+        self.video_processor.change_device(device)
+
     def change_model(self, model_mode):
         """切换RTMPose模型模式"""
         self.video_processor.change_model(model_mode)

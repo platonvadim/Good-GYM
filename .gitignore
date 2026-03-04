@@ -94,6 +94,7 @@ Thumbs.db
 
 # Ignore Anaconda/conda environments
 .conda/
+.claude
 *.conda
 *.env
 venv/

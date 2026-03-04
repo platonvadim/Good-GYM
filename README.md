@@ -22,17 +22,18 @@
 - **2025-06-12**：Optimize exercise_counters.py for counting accuracy, code structure optimization
 - **2025-11-14**: Reverted asynchronous pose detection due to accuracy issues, restored synchronous pose detection. Fixed crash when switching from statistics mode back to detection mode.
 - **2025-11-15**: New exercise database feature! All exercise configurations are now managed in `data/exercises.json` file. You can easily add, modify, or remove exercise types without modifying code.
+- **2026-03-04**: Add optional GPU acceleration support, now supports NVIDIA GPUs
 
 ## 🔮 Future Development
 
 - [x] Multi-language interface
 - [x] Improve pose detection accuracy
-- [ ] Add support for more exercise types
-- [ ] Add custom exercise types template
-- [ ] Recognizing Motion Accuracy
+- [x] Add support for more exercise types
+- [x] Add custom exercise types template
+- [x] Recognizing Motion Accuracy
+- [ ] Mobile Application Support
 - [ ] Motion Error Correction Indication
 - [ ] Add voice feedback
-- [ ] Mobile Application Support
 
 
 ---
@@ -45,7 +46,7 @@
 - **Real-time Exercise Counting** - Automatically counts your repetitions
 - **Multiple Exercise Support** - Including squats, push-ups, sit-ups, bicep curls, and many more
 - **Advanced Pose Detection** - Powered by RTMPose for accurate tracking
-- **CPU Only** - No GPU required, works on most computers
+- **CPU & GPU Support** - Works on CPU by default, with optional GPU acceleration
 - **Visual Feedback** - Live skeleton visualization with angle measurements
 - **Workout Statistics** - Track your progress over time
 - **User-friendly Interface** - Clean PyQt5 GUI with intuitive controls
@@ -62,15 +63,6 @@
   [Google Drive](https://drive.google.com/file/d/1VKDecEDLdnyi59ZmHhOvUPwAxxkw9wlH/view?usp=drive_link)
 
 ## 📝 Usage Guide
-
-### Controls
-
-- Use the interface buttons to select different exercises
-- Real-time feedback shows your current form and repetition count
-- Press the "Reset" button to reset the counter
-- Use manual adjustment buttons to correct the count if needed
-- Toggle skeleton visualization on/off
-- View your workout statistics over time
 
 ### 🎯 Custom Exercise Types
 
@@ -146,7 +138,7 @@ All exercise types are now stored in the `data/exercises.json` file. You can eas
 
 - Python 3.9
 - Webcam
-- **Windows/Mac/Linux**: CPU only, no GPU required. Performance may vary by hardware.
+- **Windows/Mac/Linux**: Works on CPU by default. Optional GPU acceleration available for source deployments.
 
 ## 🚀 Environment Setup
 
@@ -156,14 +148,14 @@ All exercise types are now stored in the `data/exercises.json` file. You can eas
    ```bash
    git clone https://github.com/yo-WASSUP/Good-GYM.git
    cd Good-GYM
-   
+
    # Create virtual environment
    python -m venv venv
    # Activate (Windows)
    .\venv\Scripts\activate
    # or (Mac/Linux)
    source venv/bin/activate
-   
+
    # Install dependencies
    pip install -r requirements.txt
    ```
@@ -172,6 +164,29 @@ All exercise types are now stored in the `data/exercises.json` file. You can eas
    ```bash
    python run.py
    ```
+
+### GPU Acceleration (Optional)
+
+If you have an NVIDIA GPU, you can enable GPU-accelerated inference for better performance.
+
+**Prerequisites**: NVIDIA GPU + NVIDIA Driver installed
+
+**Resource Usage**:
+- CUDA runtime libraries require ~**3 GB** disk space
+- Models use only ~**200 MB** VRAM — any NVIDIA GPU with 2GB+ VRAM will work
+
+```bash
+# 1. Replace onnxruntime with the GPU version
+pip uninstall onnxruntime
+pip install onnxruntime-gpu
+
+# 2. Install CUDA runtime libraries via pip (no need to install CUDA Toolkit manually)
+pip install nvidia-cudnn-cu12 nvidia-cublas-cu12 nvidia-cuda-runtime-cu12 nvidia-cufft-cu12 nvidia-curand-cu12 nvidia-cusolver-cu12 nvidia-cusparse-cu12 nvidia-cuda-nvrtc-cu12
+```
+
+The application will auto-detect GPU availability at startup. You can toggle GPU on/off via the "GPU Acceleration" switch in the control panel.
+
+> **Note**: The pre-packaged EXE only supports CPU mode. GPU acceleration is only available when running from source.
 
 ## 🖼️ Screenshots
 

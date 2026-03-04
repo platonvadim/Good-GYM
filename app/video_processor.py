@@ -348,43 +348,83 @@ class VideoProcessor:
             print(f"Error switching to camera mode: {e}")
             self.main_window.statusBar.showMessage(f"Failed to switch to camera mode: {str(e)}")
     
+    def change_device(self, device):
+        """切换推理设备 (cpu/cuda)"""
+        try:
+            if device == self.main_window.device:
+                return
+
+            # 停止视频处理
+            self.main_window.video_thread.stop()
+
+            self.main_window.statusBar.showMessage(f"Switching device to: {device}...")
+
+            old_device = self.main_window.device
+            self.main_window.device = device
+
+            print(f"Switching device: {old_device} -> {device}")
+
+            # 更新RTMPose处理器设备
+            self.main_window.pose_processor.update_device(device)
+
+            # 重新初始化视频线程
+            self.main_window.setup_video_thread()
+            QTimer.singleShot(500, self.main_window.start_video)
+
+            self.main_window.statusBar.showMessage(
+                f"RTMPose ({self.main_window.model_mode}) on {device}")
+
+        except Exception as e:
+            error_msg = f"Device switching failed: {str(e)}"
+            self.main_window.statusBar.showMessage(error_msg)
+            print(error_msg)
+
+            try:
+                self.main_window.device = old_device
+                self.main_window.pose_processor.update_device(old_device)
+                self.main_window.setup_video_thread()
+                QTimer.singleShot(500, self.main_window.start_video)
+                self.main_window.statusBar.showMessage(f"Rolled back to {old_device}")
+            except:
+                self.main_window.statusBar.showMessage("Critical error in device switching")
+
     def change_model(self, model_mode):
         """切换RTMPose模型模式"""
         try:
             if model_mode == self.main_window.model_mode:
                 # 如果是相同模式，无需重新加载
                 return
-                
+
             # 停止视频处理
             self.main_window.video_thread.stop()
-            
+
             # 显示状态信息
             self.main_window.statusBar.showMessage(f"Switching RTMPose mode to: {model_mode}...")
-            
+
             # 更新模型模式
             old_model_mode = self.main_window.model_mode
             self.main_window.model_mode = model_mode
-            
+
             print(f"Switching RTMPose mode: {old_model_mode} -> {model_mode}")
-            
+
             # 更新RTMPose处理器模式
             self.main_window.pose_processor.update_model(model_mode)
-            
+
             # 重新初始化视频线程
             self.main_window.setup_video_thread()
-            
+
             # 重新启动视频处理
             QTimer.singleShot(500, self.main_window.start_video)  # 延迟500ms后开始视频
-            
+
             # 更新状态栏
             self.main_window.statusBar.showMessage(f"Switched to RTMPose {model_mode} mode")
-            
+
         except Exception as e:
             # 如果切换失败，显示错误消息
             error_msg = f"RTMPose mode switching failed: {str(e)}"
             self.main_window.statusBar.showMessage(error_msg)
             print(error_msg)
-            
+
             # 尝试回滚到原始模式
             try:
                 self.main_window.model_mode = old_model_mode
@@ -392,7 +432,7 @@ class VideoProcessor:
                 self.main_window.setup_video_thread()
                 QTimer.singleShot(500, self.main_window.start_video)
                 self.main_window.statusBar.showMessage(f"Rolled back to RTMPose {old_model_mode} mode")
-                
+
             except:
                 # 如果回滚也失败，显示严重错误
                 self.main_window.statusBar.showMessage("Critical error in RTMPose mode switching") 
