@@ -37,6 +37,7 @@ class RTMPoseProcessor:
     
     def init_rtmpose(self, mode='balanced'):
         """Initialize RTMPose model"""
+        self.current_mode = mode
         try:
             print(f"Initializing RTMPose model (mode: {mode}, backend: {self.backend}, device: {self.device})")
             
@@ -141,6 +142,13 @@ class RTMPoseProcessor:
         print(f"Updating RTMPose model to mode: {mode}")
         self.init_rtmpose(mode)
         print(f"RTMPose processor updated to mode: {mode}")
+
+    def update_device(self, device):
+        """Update inference device (cpu or cuda)"""
+        print(f"Updating RTMPose device: {self.device} -> {device}")
+        self.device = device
+        self.init_rtmpose(self.current_mode)
+        print(f"RTMPose processor updated to device: {device}")
     
     def process_frame(self, frame, exercise_type):
         """Process single frame for pose detection and exercise counting"""
@@ -206,7 +214,8 @@ class RTMPoseProcessor:
                 "leg_raise": self.exercise_counter.count_leg_raise,
                 "knee_raise": self.exercise_counter.count_knee_raise,
                 "knee_press": self.exercise_counter.count_knee_press,
-                "crunch": self.exercise_counter.count_crunch
+                "crunch": self.exercise_counter.count_crunch,
+                "pullup": self.exercise_counter.count_pullup
             }
             
             # Get counting method

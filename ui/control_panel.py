@@ -23,6 +23,7 @@ class ControlPanel(QWidget):
     record_confirmed = pyqtSignal(str)
     model_changed = pyqtSignal(str)  # Add model switching signal
     mirror_toggled = pyqtSignal(bool)
+    device_changed = pyqtSignal(str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -261,12 +262,19 @@ class ControlPanel(QWidget):
         self.mirror_switch = SwitchControl(T.get("mirror_mode"))
         self.mirror_switch.switched.connect(self._on_mirror_toggled)
         controls_layout.addWidget(self.mirror_switch)
-        
+
+        # GPU acceleration toggle
+        self.gpu_switch = SwitchControl(T.get("gpu_acceleration"))
+        self.gpu_switch.setChecked(False)  # Default off until GPU detected
+        self.gpu_switch.setEnabled(False)  # Disabled until GPU detected
+        self.gpu_switch.switched.connect(self._on_device_toggled)
+        controls_layout.addWidget(self.gpu_switch)
+
         # Add spacing
         spacer = QWidget()
         spacer.setMinimumHeight(5)
         controls_layout.addWidget(spacer)
-        
+
         # Counter operation button row
         counter_buttons_layout = QHBoxLayout()
         # Decrease count button - orange-red
@@ -463,6 +471,15 @@ class ControlPanel(QWidget):
     def _on_mirror_toggled(self, checked):
         """Mirror mode toggle handler"""
         self.mirror_toggled.emit(checked)
+
+    def _on_device_toggled(self, checked):
+        """GPU acceleration toggle handler"""
+        self.device_changed.emit('cuda' if checked else 'cpu')
+
+    def set_gpu_available(self, available):
+        """Set GPU toggle state based on detection result"""
+        self.gpu_switch.setEnabled(available)
+        self.gpu_switch.setChecked(available)
     
     def update_counter(self, value):
         """Update counter value"""
@@ -620,6 +637,7 @@ class ControlPanel(QWidget):
         self.rotation_switch.label.setText(T.get("rotation_mode"))
         self.skeleton_switch.label.setText(T.get("skeleton_display"))
         self.mirror_switch.label.setText(T.get("mirror_mode"))
+        self.gpu_switch.label.setText(T.get("gpu_acceleration"))
         
         # Update button text
         self.increase_button.setText(T.get("increase"))
